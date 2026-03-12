@@ -2,7 +2,7 @@
 ## Title: Greetings
 ## Notes: Sends a greeting message when you join a group or raid.
 ## Author: Cosmo
-## Version: 1.0.0
+## Version: 1.0.1
 ## SavedVariables: GreetingsDB
 
 Greetings.lua

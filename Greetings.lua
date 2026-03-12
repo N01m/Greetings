@@ -3,8 +3,8 @@ local addonName, ns = ...
 -- Defaults
 local defaults = {
     enabled = true,
-    partyMessage = "o/",
-    raidMessage = "o/",
+    partyMessage = "hi",
+    raidMessage = "hi",
     greetInParty = true,
     greetInRaid = true,
     delay = 2,
@@ -15,6 +15,7 @@ local defaults = {
 local wasInGroup = false
 local wasInRaid = false
 local pendingGreet = false
+local pendingGreetOnEnterWorld = false
 local lastGreetTime = 0
 local GREET_COOLDOWN = 10
 
@@ -51,6 +52,7 @@ end
 
 local function DoGreet()
     if not GreetingsDB.enabled then return end
+    if GetNumGroupMembers() <= 1 then return end
 
     local now = GetTime()
     if (now - lastGreetTime) < GREET_COOLDOWN then return end
@@ -356,6 +358,14 @@ frame:SetScript("OnEvent", function(self, event, ...)
         if minimapBtn then
             UpdateMinimapPosition(GreetingsDB.minimapAngle)
         end
+        if pendingGreetOnEnterWorld and not pendingGreet then
+            pendingGreetOnEnterWorld = false
+            pendingGreet = true
+            C_Timer.After(GreetingsDB.delay, function()
+                pendingGreet = false
+                DoGreet()
+            end)
+        end
         return
     end
 
@@ -368,11 +378,15 @@ frame:SetScript("OnEvent", function(self, event, ...)
 
         if justJoinedGroup or justJoinedRaid then
             if not pendingGreet then
-                pendingGreet = true
-                C_Timer.After(GreetingsDB.delay, function()
-                    pendingGreet = false
-                    DoGreet()
-                end)
+                if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
+                    pendingGreetOnEnterWorld = true
+                else
+                    pendingGreet = true
+                    C_Timer.After(GreetingsDB.delay, function()
+                        pendingGreet = false
+                        DoGreet()
+                    end)
+                end
             end
         end
 
