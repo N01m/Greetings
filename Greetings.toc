@@ -1,7 +1,7 @@
 ## Interface: 120001
 ## Title: Greetings
 ## Notes: Sends a greeting message when you join a group or raid.
-## Author: Cosmo
+## Author: N01m
 ## Version: 1.0.1
 ## SavedVariables: GreetingsDB
 
