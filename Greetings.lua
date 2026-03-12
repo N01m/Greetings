@@ -37,7 +37,8 @@ end
 -- Core logic
 ------------------------------------------------------------
 local function GetPartyChatType()
-    if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) then
+    local inInstance = select(1, IsInInstance())
+    if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or inInstance then
         return "INSTANCE_CHAT"
     end
     return "PARTY"
@@ -130,7 +131,7 @@ local function CreateMinimapButton()
 
     local icon = minimapBtn:CreateTexture(nil, "ARTWORK")
     icon:SetSize(17, 17)
-    icon:SetTexture("Interface\\Icons\\Achievement_GuildPerk_EverybodysFriend")
+    icon:SetTexture("Interface\\Icons\\INV_Drink_05")
     icon:SetTexCoord(0.05, 0.95, 0.05, 0.95)
     icon:SetPoint("TOPLEFT", 7, -6)
 
@@ -214,6 +215,10 @@ function ToggleConfigPanel()
     f.title = f:CreateFontString(nil, "OVERLAY", "GameFontHighlight")
     f.title:SetPoint("TOPLEFT", 10, -6)
     f.title:SetText("Greetings Settings")
+
+    local version = f:CreateFontString(nil, "OVERLAY", "GameFontDisableSmall")
+    version:SetPoint("BOTTOMRIGHT", -10, 10)
+    version:SetText("v" .. C_AddOns.GetAddOnMetadata(addonName, "Version"))
 
     local yOff = -40
 

@@ -1,13 +1,17 @@
 # Changelog
 
-## [1.0.1]
+## [Unreleased]
 
 ### Fixed
-- LFG/Group Finder dungeon groups now correctly wait until you are loaded into the instance before sending the greeting (previously the message was sent during the loading screen before instance chat was ready)
+
+- LFG/Group Finder dungeon groups now correctly wait until you are loaded into the instance before sending the greeting
 - Greeting no longer fires when you create a group by yourself with no other members
 
 ### Changed
+
 - Default greeting message changed from `o/` to `hi`
+- Minimap button icon changed
+- Settings panel now shows the current version number in the bottom-right corner
 
 ## [1.0.0]
 
