@@ -12,8 +12,6 @@ local defaults = {
 }
 
 -- State tracking
-local wasInGroup = false
-local wasInRaid = false
 local pendingGreet = false
 local pendingGreetOnEnterWorld = false
 local lastGreetTime = 0
@@ -222,7 +220,7 @@ function ToggleConfigPanel()
 
     local yOff = -40
 
-    local enableCB = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
+    local enableCB = CreateFrame("CheckButton", "GreetingsEnableCB", f, "UICheckButtonTemplate")
     enableCB:SetPoint("TOPLEFT", 16, yOff)
     enableCB.Text:SetText("Enabled")
     enableCB:SetChecked(GreetingsDB.enabled)
@@ -231,7 +229,7 @@ function ToggleConfigPanel()
     end)
     yOff = yOff - 30
 
-    local partyCB = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
+    local partyCB = CreateFrame("CheckButton", "GreetingsPartyCB", f, "UICheckButtonTemplate")
     partyCB:SetPoint("TOPLEFT", 16, yOff)
     partyCB.Text:SetText("Greet in Party/Dungeon groups")
     partyCB:SetChecked(GreetingsDB.greetInParty)
@@ -240,7 +238,7 @@ function ToggleConfigPanel()
     end)
     yOff = yOff - 30
 
-    local raidCB = CreateFrame("CheckButton", nil, f, "UICheckButtonTemplate")
+    local raidCB = CreateFrame("CheckButton", "GreetingsRaidCB", f, "UICheckButtonTemplate")
     raidCB:SetPoint("TOPLEFT", 16, yOff)
     raidCB.Text:SetText("Greet in Raid groups")
     raidCB:SetChecked(GreetingsDB.greetInRaid)
@@ -339,6 +337,58 @@ function ToggleConfigPanel()
     end)
 
     ns.configFrame = f
+    ns.widgets = {
+        enableCB = enableCB,
+        partyCB = partyCB,
+        raidCB = raidCB,
+        partyBox = partyBox,
+        raidBox = raidBox,
+        delayBox = delayBox,
+        resetBtn = resetBtn,
+        testBtn = testBtn,
+    }
+
+    if ns.SkinConfigFrame then
+        ns.SkinConfigFrame()
+    end
+end
+
+------------------------------------------------------------
+-- ElvUI skin
+------------------------------------------------------------
+local function TrySkinElvUI()
+    local E = unpack(ElvUI)
+    local S = E:GetModule("Skins")
+
+    ns.SkinConfigFrame = function()
+        local f = ns.configFrame
+        local w = ns.widgets
+        if not f or f.elvuiSkinned then return end
+
+        f:StripTextures()
+        f:SetTemplate("Transparent")
+
+        if f.CloseButton then S:HandleCloseButton(f.CloseButton) end
+
+        S:HandleCheckBox(w.enableCB)
+        S:HandleCheckBox(w.partyCB)
+        S:HandleCheckBox(w.raidCB)
+        S:HandleEditBox(w.partyBox)
+        S:HandleEditBox(w.raidBox)
+        S:HandleEditBox(w.delayBox)
+        S:HandleButton(w.resetBtn)
+        S:HandleButton(w.testBtn)
+
+        f.elvuiSkinned = true
+    end
+
+    if ns.configFrame then
+        ns.SkinConfigFrame()
+    end
+end
+
+if C_AddOns.IsAddOnLoaded("ElvUI") then
+    TrySkinElvUI()
 end
 
 ------------------------------------------------------------
@@ -347,13 +397,11 @@ end
 local frame = CreateFrame("Frame")
 frame:RegisterEvent("PLAYER_LOGIN")
 frame:RegisterEvent("PLAYER_ENTERING_WORLD")
-frame:RegisterEvent("GROUP_ROSTER_UPDATE")
+frame:RegisterEvent("GROUP_JOINED")
 
 frame:SetScript("OnEvent", function(self, event, ...)
     if event == "PLAYER_LOGIN" then
         EnsureDB()
-        wasInGroup = IsInGroup()
-        wasInRaid = IsInRaid()
         CreateMinimapButton()
         print("|cff00ccffGreetings|r loaded. Type |cff00ff00/greet|r to configure.")
         return
@@ -374,29 +422,19 @@ frame:SetScript("OnEvent", function(self, event, ...)
         return
     end
 
-    if event == "GROUP_ROSTER_UPDATE" then
-        local inGroup = IsInGroup()
-        local inRaid = IsInRaid()
-
-        local justJoinedGroup = (not wasInGroup) and inGroup
-        local justJoinedRaid = (not wasInRaid) and inRaid
-
-        if justJoinedGroup or justJoinedRaid then
-            if not pendingGreet then
-                if IsInGroup(LE_PARTY_CATEGORY_INSTANCE) or IsInRaid(LE_PARTY_CATEGORY_INSTANCE) then
-                    pendingGreetOnEnterWorld = true
-                else
-                    pendingGreet = true
-                    C_Timer.After(GreetingsDB.delay, function()
-                        pendingGreet = false
-                        DoGreet()
-                    end)
-                end
+    if event == "GROUP_JOINED" then
+        local category = ...
+        if not pendingGreet then
+            if category == LE_PARTY_CATEGORY_INSTANCE then
+                pendingGreetOnEnterWorld = true
+            else
+                pendingGreet = true
+                C_Timer.After(GreetingsDB.delay, function()
+                    pendingGreet = false
+                    DoGreet()
+                end)
             end
         end
-
-        wasInGroup = inGroup
-        wasInRaid = inRaid
     end
 end)
 

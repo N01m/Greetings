@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.2]
+
+### Fixed
+
+- Greetings now fire correctly when joining a new group while already grouped
+
+### Changed
+
+- ElvUI users will now see the config panel styled to match their UI
+
 ## [1.0.1]
 
 ### Fixed
