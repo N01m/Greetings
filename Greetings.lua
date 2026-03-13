@@ -258,12 +258,27 @@ function ToggleConfigPanel()
     partyBox:SetAutoFocus(false)
     partyBox:SetText(GreetingsDB.partyMessage)
     partyBox:SetScript("OnEnterPressed", function(self)
-        GreetingsDB.partyMessage = self:GetText()
+        local msg = self:GetText():trim()
+        self:SetText(msg)
+        GreetingsDB.partyMessage = msg
         self:ClearFocus()
-        print("|cff00ccffGreetings|r party message set to: " .. GreetingsDB.partyMessage)
+        if msg == "" then
+            print("|cff00ccffGreetings|r party message cleared (greeting will not be sent).")
+        else
+            print("|cff00ccffGreetings|r party message set to: " .. msg)
+        end
     end)
     partyBox:SetScript("OnEditFocusLost", function(self)
-        GreetingsDB.partyMessage = self:GetText()
+        local msg = self:GetText():trim()
+        self:SetText(msg)
+        if msg ~= GreetingsDB.partyMessage then
+            GreetingsDB.partyMessage = msg
+            if msg == "" then
+                print("|cff00ccffGreetings|r party message cleared (greeting will not be sent).")
+            else
+                print("|cff00ccffGreetings|r party message set to: " .. msg)
+            end
+        end
     end)
     partyBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
     yOff = yOff - 34
@@ -279,12 +294,27 @@ function ToggleConfigPanel()
     raidBox:SetAutoFocus(false)
     raidBox:SetText(GreetingsDB.raidMessage)
     raidBox:SetScript("OnEnterPressed", function(self)
-        GreetingsDB.raidMessage = self:GetText()
+        local msg = self:GetText():trim()
+        self:SetText(msg)
+        GreetingsDB.raidMessage = msg
         self:ClearFocus()
-        print("|cff00ccffGreetings|r raid message set to: " .. GreetingsDB.raidMessage)
+        if msg == "" then
+            print("|cff00ccffGreetings|r raid message cleared (greeting will not be sent).")
+        else
+            print("|cff00ccffGreetings|r raid message set to: " .. msg)
+        end
     end)
     raidBox:SetScript("OnEditFocusLost", function(self)
-        GreetingsDB.raidMessage = self:GetText()
+        local msg = self:GetText():trim()
+        self:SetText(msg)
+        if msg ~= GreetingsDB.raidMessage then
+            GreetingsDB.raidMessage = msg
+            if msg == "" then
+                print("|cff00ccffGreetings|r raid message cleared (greeting will not be sent).")
+            else
+                print("|cff00ccffGreetings|r raid message set to: " .. msg)
+            end
+        end
     end)
     raidBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
     yOff = yOff - 34
@@ -298,16 +328,24 @@ function ToggleConfigPanel()
     delayBox:SetSize(50, 24)
     delayBox:SetAutoFocus(false)
     delayBox:SetText(tostring(GreetingsDB.delay))
-    delayBox:SetScript("OnEnterPressed", function(self)
+    local function applyDelay(self)
         local val = tonumber(self:GetText())
         if val and val >= 0 and val <= 30 then
-            GreetingsDB.delay = val
-            print("|cff00ccffGreetings|r delay set to " .. val .. "s")
+            if val ~= GreetingsDB.delay then
+                GreetingsDB.delay = val
+                print("|cff00ccffGreetings|r delay set to " .. val .. "s")
+            end
         else
             self:SetText(tostring(GreetingsDB.delay))
             print("|cff00ccffGreetings|r delay must be 0-30 seconds.")
         end
+    end
+    delayBox:SetScript("OnEnterPressed", function(self)
+        applyDelay(self)
         self:ClearFocus()
+    end)
+    delayBox:SetScript("OnEditFocusLost", function(self)
+        applyDelay(self)
     end)
     delayBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
 
