@@ -6,6 +6,10 @@
 
 - Custom messages are now saved when clicking away from the text field, not just on Enter
 
+### Fixed
+
+- Various settings panel edge cases and feedback improvements
+
 ### Changed
 
 - Removed the Reset to Default button from the settings panel
