@@ -262,6 +262,9 @@ function ToggleConfigPanel()
         self:ClearFocus()
         print("|cff00ccffGreetings|r party message set to: " .. GreetingsDB.partyMessage)
     end)
+    partyBox:SetScript("OnEditFocusLost", function(self)
+        GreetingsDB.partyMessage = self:GetText()
+    end)
     partyBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
     yOff = yOff - 34
 
@@ -279,6 +282,9 @@ function ToggleConfigPanel()
         GreetingsDB.raidMessage = self:GetText()
         self:ClearFocus()
         print("|cff00ccffGreetings|r raid message set to: " .. GreetingsDB.raidMessage)
+    end)
+    raidBox:SetScript("OnEditFocusLost", function(self)
+        GreetingsDB.raidMessage = self:GetText()
     end)
     raidBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
     yOff = yOff - 34
@@ -304,27 +310,9 @@ function ToggleConfigPanel()
         self:ClearFocus()
     end)
     delayBox:SetScript("OnEscapePressed", function(self) self:ClearFocus() end)
-    yOff = yOff - 40
-
-    local resetBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    resetBtn:SetPoint("TOPLEFT", 16, yOff)
-    resetBtn:SetSize(120, 26)
-    resetBtn:SetText("Reset to Default")
-    resetBtn:SetScript("OnClick", function()
-        for k, v in pairs(defaults) do
-            GreetingsDB[k] = v
-        end
-        partyBox:SetText(defaults.partyMessage)
-        raidBox:SetText(defaults.raidMessage)
-        delayBox:SetText(tostring(defaults.delay))
-        enableCB:SetChecked(defaults.enabled)
-        partyCB:SetChecked(defaults.greetInParty)
-        raidCB:SetChecked(defaults.greetInRaid)
-        print("|cff00ccffGreetings|r settings reset to defaults.")
-    end)
 
     local testBtn = CreateFrame("Button", nil, f, "UIPanelButtonTemplate")
-    testBtn:SetPoint("LEFT", resetBtn, "RIGHT", 10, 0)
+    testBtn:SetPoint("BOTTOM", f, "BOTTOM", 0, 16)
     testBtn:SetSize(80, 26)
     testBtn:SetText("Test")
     testBtn:SetScript("OnClick", function()
@@ -344,7 +332,6 @@ function ToggleConfigPanel()
         partyBox = partyBox,
         raidBox = raidBox,
         delayBox = delayBox,
-        resetBtn = resetBtn,
         testBtn = testBtn,
     }
 
@@ -376,7 +363,6 @@ local function TrySkinElvUI()
         S:HandleEditBox(w.partyBox)
         S:HandleEditBox(w.raidBox)
         S:HandleEditBox(w.delayBox)
-        S:HandleButton(w.resetBtn)
         S:HandleButton(w.testBtn)
 
         f.elvuiSkinned = true

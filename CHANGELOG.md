@@ -1,5 +1,15 @@
 # Changelog
 
+## [1.0.3]
+
+### Fixed
+
+- Custom messages are now saved when clicking away from the text field, not just on Enter
+
+### Changed
+
+- Removed the Reset to Default button from the settings panel
+
 ## [1.0.2]
 
 ### Fixed
